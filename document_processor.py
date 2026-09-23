@@ -24,20 +24,33 @@ def split_text_into_chunks(
     chunk_size: int = 1000,
     chunk_overlap: int = 200
 ) -> list[str]:
-    """Split text into overlapping chunks."""
+    """Split text into overlapping chunks while respecting paragraphs."""
+
+    paragraphs = text.split("\n\n")
 
     chunks = []
+    current_chunk = ""
 
-    start = 0
+    for paragraph in paragraphs:
+        paragraph = paragraph.strip()
 
-    while start < len(text):
-        end = start + chunk_size
+        if not paragraph:
+            continue
 
-        chunk = text[start:end].strip()
+        # Add paragraph to current chunk
+        if len(current_chunk) + len(paragraph) <= chunk_size:
+            current_chunk += paragraph + "\n\n"
 
-        if chunk:
-            chunks.append(chunk)
+        else:
+            # Save current chunk
+            if current_chunk.strip():
+                chunks.append(current_chunk.strip())
 
-        start += chunk_size - chunk_overlap
+            # Start a new chunk
+            current_chunk = paragraph + "\n\n"
+
+    # Save the final chunk
+    if current_chunk.strip():
+        chunks.append(current_chunk.strip())
 
     return chunks
