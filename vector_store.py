@@ -48,8 +48,11 @@ def add_chunks(chunks: list[str], source: str) -> None:
         embeddings=embeddings,
         metadatas=metadatas
     )    
-def search_documents(query: str, n_results: int = 5) -> list[str]:
-    """Search for relevant document chunks using semantic + keyword relevance."""
+def search_documents(
+    query: str,
+    n_results: int = 5
+) -> list[dict]:
+    """Search documents using semantic, keyword, and entity relevance."""
 
     query_embedding = generate_embedding(query)
 
@@ -59,31 +62,95 @@ def search_documents(query: str, n_results: int = 5) -> list[str]:
     )
 
     documents = results["documents"][0]
+    metadatas = results["metadatas"][0]
+    distances = results["distances"][0]
 
-    # Extract useful keywords from the question
-    query_words = set(query.lower().split())
+    query_lower = query.lower()
+    query_words = set(query_lower.split())
 
     scored_documents = []
 
-    for document in documents:
-        document_words = set(document.lower().split())
+    for document, metadata, distance in zip(
+        documents,
+        metadatas,
+        distances
+    ):
+        document_lower = document.lower()
+        document_words = set(document_lower.split())
 
-        # Count matching keywords
-        keyword_matches = len(query_words.intersection(document_words))
-
-        # Combine keyword relevance with document position
-        scored_documents.append(
-            (keyword_matches, document)
+        # 1. Keyword matching
+        keyword_matches = len(
+            query_words.intersection(document_words)
         )
 
-    # Sort by keyword matches
+        # 2. Semantic similarity
+        semantic_score = 1 / (1 + distance)
+
+        # 3. Exact phrase matching
+        exact_phrase_score = 0
+
+        if query_lower in document_lower:
+            exact_phrase_score = 2
+
+        # 4. Important entity/name matching
+        entity_score = 0
+        if "gaurav kumar" in query_lower and "gaurav kumar" in document_lower:
+         entity_score += 5
+
+        if "pranshu singh" in query_lower and "pranshu singh" in document_lower:
+         entity_score += 5
+
+        important_words = [
+            word for word in query_words
+            if len(word) > 3
+            and word not in {
+                "what",
+                "which",
+                "where",
+                "when",
+                "does",
+                "have",
+                "with",
+                "from",
+                "this",
+                "that"
+            }
+        ]
+
+        for word in important_words:
+            if word in document_lower:
+                entity_score += 1
+
+        # Combined score
+        final_score = (
+            semantic_score * 0.5
+            + keyword_matches * 0.2
+            + exact_phrase_score * 1.0
+            + entity_score * 0.3
+        )
+
+        scored_documents.append(
+            (
+                final_score,
+                document,
+                metadata
+            )
+        )
+
     scored_documents.sort(
         key=lambda x: x[0],
         reverse=True
     )
 
-    return [document for _, document in scored_documents[:n_results]]
+    selected_documents = scored_documents[:n_results]
 
+    return [
+        {
+            "text": document,
+            "source": metadata["source"]
+        }
+        for _, document, metadata in selected_documents
+    ]
 def generate_embedding(text: str) -> list[float]:
     """Generate an embedding for the given text."""
 

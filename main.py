@@ -17,6 +17,11 @@ def home():
 
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
+
+    if file.content_type != "application/pdf":
+        return {
+            "error": "Only PDF files are supported."
+        }
     file_path = os.path.join("uploads", file.filename)
 
     with open(file_path, "wb") as buffer:
@@ -37,9 +42,10 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 @app.post("/chat")
 async def chat(question: str):
-    answer = answer_question(question)
+  result = answer_question(question)
 
-    return {
-        "question": question,
-        "answer": answer
-    }
+  return {
+    "question": question,
+    "answer": result["answer"],
+    "sources": result["sources"]
+}
