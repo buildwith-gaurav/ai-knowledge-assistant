@@ -161,13 +161,5 @@ def generate_embedding(text: str) -> list[float]:
 
     return response.embeddings[0].values
 
-results = search_documents(
-    "What is Agentic Artificial Intelligence?"
-)
 
-print("\nRelevant chunks:")
-
-for i, result in enumerate(results, start=1):
-    print(f"\n--- Chunk {i} ---")
-    print(result)
 
