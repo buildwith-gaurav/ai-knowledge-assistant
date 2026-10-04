@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Knowledge Assistant</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>AI Knowledge Assistant</h1>
+
+        <p>Upload a PDF and ask questions from your document.</p>
+
+        <!-- PDF Upload -->
+        <section>
+            <h2>Upload PDF</h2>
+
+            <input type="file" id="pdfFile" accept=".pdf">
+
+            <button id="uploadBtn">Upload PDF</button>
+
+            <p id="uploadStatus"></p>
+        </section>
+
+        <!-- Question -->
+        <section>
+            <h2>Ask a Question</h2>
+
+            <input
+                type="text"
+                id="question"
+                placeholder="Ask something about your PDF..."
+            >
+
+            <button id="askBtn">Ask</button>
+        </section>
+
+        <!-- Answer -->
+        <section>
+            <h2>Answer</h2>
+
+            <div id="answer">
+                Your answer will appear here.
+            </div>
+        </section>
+
+        <!-- Sources -->
+        <section>
+            <h2>Sources</h2>
+
+            <ul id="sources">
+                <li>No sources yet.</li>
+            </ul>
+        </section>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
