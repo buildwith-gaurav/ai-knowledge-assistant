@@ -8,6 +8,15 @@ const uploadStatus = document.getElementById("uploadStatus");
 const answerBox = document.getElementById("answer");
 const sourcesList = document.getElementById("sources");
 
+function formatAnswer(text) {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\n/g, "<br>");
+}
+
 
 /* =========================
    PDF UPLOAD
@@ -90,7 +99,7 @@ askBtn.addEventListener("click", async () => {
             return;
         }
 
-        answerBox.textContent = data.answer;
+        answerBox.innerHTML = formatAnswer(data.answer);
 
         data.sources.forEach(source => {
 

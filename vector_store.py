@@ -161,5 +161,18 @@ def generate_embedding(text: str) -> list[float]:
 
     return response.embeddings[0].values
 
+def clear_documents():
+    """Remove all stored documents from the collection."""
+
+    global collection
+
+    chroma_client.delete_collection(name="documents")
+
+    collection = chroma_client.get_or_create_collection(
+        name="documents"
+    )
+
+    print("Previous documents cleared successfully.")
+
 
 

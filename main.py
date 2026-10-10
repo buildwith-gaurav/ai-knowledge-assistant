@@ -4,7 +4,7 @@ import shutil
 import os
 
 from document_processor import extract_text_from_pdf, split_text_into_chunks
-from vector_store import add_chunks
+from vector_store import add_chunks, clear_documents
 from rag import answer_question
 
 
@@ -24,35 +24,32 @@ app.add_middleware(
 def home():
     return {"message": "AI Knowledge Assistant is running"}
 
-
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
 
-    # Check file type
     if file.content_type != "application/pdf":
         return {
             "error": "Only PDF files are supported."
         }
 
-    # Save uploaded file
     file_path = os.path.join("uploads", file.filename)
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # Extract text
     text = extract_text_from_pdf(file_path)
 
-    # Check if PDF contains readable text
     if not text.strip():
         return {
             "error": "Could not extract readable text from the PDF."
         }
 
-    # Split text into chunks
     chunks = split_text_into_chunks(text)
 
-    # Store chunks and embeddings
+    # Remove previously stored document chunks
+    clear_documents()
+
+    # Store chunks from the newly uploaded PDF
     add_chunks(chunks, file.filename)
 
     return {

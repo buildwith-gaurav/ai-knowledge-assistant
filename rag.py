@@ -17,6 +17,7 @@ def answer_question(question: str) -> dict:
         chunk["text"] for chunk in relevant_chunks
     )
 
+
     # 3. Get source filenames
     sources = list(
         set(chunk["source"] for chunk in relevant_chunks)
